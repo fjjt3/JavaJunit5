@@ -91,10 +91,16 @@ class CountTest {
         bank.setName("Banco del Estado");
         bank.transfer(count2, count1, new BigDecimal("500"));
 
-        assertEquals("1000.8989", count2.getBalance().toPlainString());
-        assertEquals("3000", count1.getBalance().toString());
+        assertAll(()->{
+                    assertEquals("1000.8989", count2.getBalance().toPlainString());},
+                ()->assertEquals("3000", count1.getBalance().toString()),
+                ()->assertEquals(2, bank.getCounts().size()),
+                ()->assertEquals("Banco del Estado", count1.getBank().getName()),
+                ()->assertEquals("Andrew", bank.getCounts().stream().filter(c ->c.getPerson().equals("Andrew"))
+                        .findFirst()
+                        .get().getPerson()),
+                ()->assertTrue(bank.getCounts().stream().anyMatch(c ->c.getPerson().equals("Andrew"))));
 
-        assertEquals(2, bank.getCounts().size());
 
     }
 }
