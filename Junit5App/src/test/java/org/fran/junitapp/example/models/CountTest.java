@@ -2,28 +2,50 @@ package org.fran.junitapp.example.models;
 
 
 import org.fran.junitapp.example.exceptions.RedNumbersException;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CountTest {
+    Count count;
+    @BeforeEach
+    void initMethodTest(){
+        this.count = new Count("Frank", new BigDecimal("1000.12345"));
+        System.out.println("Method initialized");
+    }
+
+    @AfterEach
+    void tearDown(){
+        System.out.println("Method finished");
+    }
+
+    @BeforeAll
+    static void beforeAll(){
+        System.out.println("Test initialized");
+    }
+
+    @AfterAll
+    static void afterAll(){
+        System.out.println("Test finished");
+    }
 
     @Test
+    @DisplayName("name testing")
     void testNameCount(){
-        Count count = new Count("Frank", new BigDecimal("1000000000.585"));
+
         // count.setPerson("Frank");
         String expected = "Frank";
         String real = count.getPerson();
-        assertEquals(expected, real);
+        assertNotNull(real, ()-> "Count must not be null");
+        assertEquals(expected, real, ()->"Expected name in wrong");
         assertTrue(real.equals("Frank"));
 
     }
 
     @Test
     void testBalanceCount(){
-        Count count = new Count("Frank", new BigDecimal("1000.12345"));
         assertNotNull(count.getBalance());
         assertEquals(1000.12345, count.getBalance().doubleValue());
         assertFalse(count.getBalance().compareTo(BigDecimal.ZERO) < 0);
@@ -31,14 +53,13 @@ class CountTest {
 
     @Test
     void testReferenceCount(){
-        Count count = new Count("John Doe", new BigDecimal("1000.123"));
+        count = new Count("John Doe", new BigDecimal("1000.123"));
         Count count2 = new Count("John Doe", new BigDecimal("1000.123"));
         assertEquals(count, count2);
     }
 
     @Test
     void testDebitCount(){
-        Count count = new Count("Mark", new BigDecimal("1000.12345"));
         count.debit(new BigDecimal(100));
         assertNotNull(count.getBalance());
         assertEquals(900, count.getBalance().intValue());
@@ -47,7 +68,6 @@ class CountTest {
 
     @Test
     void testCreditCount(){
-        Count count = new Count("Mark", new BigDecimal("1000.12345"));
         count.credit(new BigDecimal(100));
         assertNotNull(count.getBalance());
         assertEquals(1100, count.getBalance().intValue());
@@ -56,7 +76,6 @@ class CountTest {
 
     @Test
     void testRedNumbersExceptionCount(){
-        Count count = new Count("Mark", new BigDecimal("1000.12345"));
         Exception exception = assertThrows(RedNumbersException.class, () ->{
             count.debit(new BigDecimal(1500));
         });
